@@ -2,6 +2,7 @@
 
 Screenshot : 
 
+
 ![SS 1](https://github.com/unofficialmohit/MusicPlayer/assets/123811704/80dd212b-5c08-437c-b2bd-2ff3612466cf)
 
 
@@ -18,3 +19,4 @@ Screenshot :
 
 
 ![SS 6](https://github.com/unofficialmohit/MusicPlayer/assets/123811704/9046dc58-0a60-444f-842f-a8c39360dc8a)
+
