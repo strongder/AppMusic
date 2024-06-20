@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MusicList"
+    android:background="#000000">
+    <androidx.appcompat.widget.SearchView
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginLeft="10dp"
+       android:layout_marginRight="10dp"
+        android:id="@+id/searchsong"
+        android:theme="@style/AppSearchView"
+
+        >
+
+    </androidx.appcompat.widget.SearchView>
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_below="@id/searchsong"
+       android:orientation="horizontal"
+       android:gravity="center"
+       android:paddingTop="5dp"
+       >
+
+       <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="8dp"
+        android:dropDownWidth="123dp"
+        android:background="@android:drawable/spinner_dropdown_background"
+        android:layout_gravity="center"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:spinnerMode="dropdown"/>
+      <ImageButton
+          android:layout_width="20dp"
+          android:layout_height="30dp"
+          android:background="@drawable/downarrow"
+          android:scaleType="fitXY"
+          android:id="@+id/orderSort">
+
+      ></ImageButton>
+       <ImageButton
+           android:layout_width="25dp"
+           android:layout_height="25dp"
+           android:scaleType="fitXY"
+           android:background="@drawable/refresh"
+           android:id="@+id/reload"
+           android:layout_marginLeft="80dp"
+
+           ></ImageButton>
+       <TextView
+           android:id="@+id/totalSong"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:textAlignment="textEnd"
+           android:text="0 Songs"
+           android:layout_marginRight="20dp"
+           android:textColor="@color/white"
+           android:textSize="15dp"
+           >
+
+       </TextView>
+   </LinearLayout>
+<androidx.recyclerview.widget.RecyclerView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/recyclerView"
+    android:layout_marginTop="140dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginBottom="70dp"
+    android:scrollbars="vertical"
+    android:theme="@style/RecyclerViewScrollBarStyle"
+    />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/recyclerView"
+        android:layout_marginTop="-75dp"
+        android:background="#1E1B1B"
+        android:id="@+id/seekList"
+
+
+        >
+<SeekBar
+    android:id="@+id/seekBar"
+    android:layout_width="match_parent"
+    android:layout_height="5dp"
+    android:paddingTop="2dp"
+    android:splitTrack="false"
+    ></SeekBar>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/miniPlayer"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_below="@id/recyclerView"
+        android:layout_marginTop="-70dp"
+        android:background="#1E1B1B"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+    <com.google.android.material.imageview.ShapeableImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/musicbutton"
+        android:id="@+id/thumb"
+        android:scaleType="fitXY"
+        android:layout_marginStart="70dp"
+        >
+
+    </com.google.android.material.imageview.ShapeableImageView>
+        <TextView
+            android:id="@+id/currentSongName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:text="Nothing to Play"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            android:textSize="18dp"
+            android:gravity="center"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            tools:ignore="RtlCompat"
+            android:paddingStart="15dp"
+            ></TextView>
+
+
+        <ImageButton
+            android:id="@+id/playPauseListPage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/playbutton"
+            android:layout_marginEnd="70dp"
+
+
+            ></ImageButton>
+
+
+
+
+    </LinearLayout>
+</RelativeLayout>
