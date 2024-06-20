@@ -44,7 +44,6 @@
           android:background="@drawable/downarrow"
           android:scaleType="fitXY"
           android:id="@+id/orderSort">
-
       </ImageButton>
 
        <ImageButton
@@ -53,9 +52,8 @@
            android:layout_height="20dp"
            android:layout_marginLeft="80dp"
            android:background="@drawable/refresh"
-           android:scaleType="fitXY"
+           android:scaleType="fitXY"></ImageButton>
 
-           ></ImageButton>
        <TextView
            android:id="@+id/totalSong"
            android:layout_width="match_parent"
