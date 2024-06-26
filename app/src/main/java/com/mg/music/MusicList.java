@@ -11,11 +11,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+
+import android.app.RecoverableSecurityException;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -36,6 +39,7 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -48,6 +52,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
@@ -66,6 +71,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 public class MusicList extends AppCompatActivity implements ActionPlaying, ServiceConnection {
@@ -76,6 +82,8 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
     public static List<AudioFile> NowPlayingList= new ArrayList<>();
     public AudioAdapter audioAdapter;
     public static final int REQUEST_CODE = 1;
+    private static final int REQUEST_DELETE_PERMISSION = 1;
+    AudioFile audioDelete;
     int permissionAllowed =0;
     public SearchView searchSong;
     public Spinner spinner;
@@ -116,6 +124,7 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
         dialog.setCancelable(false);
         dialog.setInverseBackgroundForced(false);
         dialog.show();
+        Toast.makeText(this, "oncreat", Toast.LENGTH_LONG).show();
         audioFiles.clear();
         MyApplication myapp = (MyApplication) getApplication();
         mediaPlayer = myapp.getMediaPlayer();
@@ -131,7 +140,7 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
         thumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            NowPlay();
+                NowPlay();
             }
         });
         ShapeAppearanceModel shapeAppearanceModel = new
@@ -150,7 +159,7 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
             }
 
             public void onSwipeRight() {
-               prevSong();
+                prevSong();
                 showNotification(R.drawable.pausebutton);
 
             }
@@ -172,10 +181,11 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
             @Override
             public void onClick(View view) {
                 Toast.makeText(myapp, "Refreshing Music List", Toast.LENGTH_SHORT).show();
-                dialog.show();
+             //   dialog.show();
                 audioFiles.clear();
                 loadAudioFiles();
-                filterAudioFiles(srch);
+                audioAdapter.notifyDataSetChanged();
+              //  filterAudioFiles(srch);
                 Toast.makeText(myapp, "Music List Refreshed", Toast.LENGTH_SHORT).show();
 
             }
@@ -186,28 +196,28 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
             @Override
             public void onClick(View view) {
 
-            if(!hasPlayed)
-            {
+                if(!hasPlayed)
+                {
                     Toast.makeText(myapp, "Nothing to Play", Toast.LENGTH_SHORT).show();
                     return;
-            }
+                }
 
-            if(mediaPlayer.isPlaying())
-            {   isFocused=0;
-                audioManager.abandonAudioFocus(audioFocusListener);
-                mediaPlayer.pause();
-                playPauseButton.setBackgroundResource(R.drawable.playbutton);
-                showNotification(R.drawable.playbutton);
+                if(mediaPlayer.isPlaying())
+                {   isFocused=0;
+                    audioManager.abandonAudioFocus(audioFocusListener);
+                    mediaPlayer.pause();
+                    playPauseButton.setBackgroundResource(R.drawable.playbutton);
+                    showNotification(R.drawable.playbutton);
 
-            }
-            else
-            {   getAudioFocus();
-                mediaPlayer.seekTo(mediaPlayer.getCurrentPosition());
-                mediaPlayer.start();
-                playPauseButton.setBackgroundResource(R.drawable.pausebutton);
-                showNotification(R.drawable.pausebutton);
+                }
+                else
+                {   getAudioFocus();
+                    mediaPlayer.seekTo(mediaPlayer.getCurrentPosition());
+                    mediaPlayer.start();
+                    playPauseButton.setBackgroundResource(R.drawable.pausebutton);
+                    showNotification(R.drawable.pausebutton);
 
-            }
+                }
             }
         });
 
@@ -311,26 +321,11 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
                 return true;
             }
         });
-//        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-//        MyAudioFocusChangeListener audioFocusListener = new MyAudioFocusChangeListener(this);
-//
-//        int result = audioManager.requestAudioFocus(
-//                audioFocusListener,
-//                AudioManager.STREAM_MUSIC, // Audio stream type
-//                AudioManager.AUDIOFOCUS_GAIN // Request permanent audio focus
-//        );
-//
-//        if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-//            Toast.makeText(myapp, "Audio Focus Not Available", Toast.LENGTH_SHORT).show();
-//        }
+
 
         audioAdapter.setOnItemClickListener(new AudioAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-//              AudioFile clickedAudio= audioFiles.get(position);
-//              Toast.makeText(MusicList.this, clickedAudio.getFilePath(), Toast.LENGTH_SHORT).show();
-
-//                intent.putExtra("path",position);
                 pos = position;   //sending position to static variable to use in mainActivity
                 NowPlayingList.clear();
                 ;
@@ -352,9 +347,15 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
             }
         });
 
+        audioAdapter.setOnDeleteClickListener((audioFile, position) ->{
+            audioDelete  = audioFile;
+            deleteAudioFile(audioFile);
+        });
+
+
     }
-public void getAudioFocus()
-{
+    public void getAudioFocus()
+    {
     if (isFocused == 0) {
         isFocused=1;
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -369,7 +370,7 @@ public void getAudioFocus()
             Toast.makeText(MusicList.this, "Audio Focus Not Available", Toast.LENGTH_SHORT).show();
         }
     }
-}
+    }
 //    @Override
 //    protected void onPause() {
 //
@@ -577,24 +578,7 @@ public void getAudioFocus()
         }
 
     }
-    public void checkPermission()
-    {
-        String[] permissions = {
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.READ_MEDIA_AUDIO,
-                Manifest.permission.POST_NOTIFICATIONS
-        };
 
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE);
-        // Load audio files if all permissions are granted
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED ) {
-            permissionAllowed=1;
-        }
-        else if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )
-        {
-            permissionAllowed=1;
-        }
-    }
     public void filterAudioFiles(String query) {
         audioFiles.clear();
         if(query.isEmpty()){
@@ -613,6 +597,8 @@ public void getAudioFocus()
 
         totalSong.setText(audioFiles.size() + " Songs");
     }
+
+
     public void loadAudioFiles() {
         ContentResolver contentResolver = getContentResolver();
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -641,12 +627,92 @@ public void getAudioFocus()
                 }
                 }while(cursor.moveToNext());
             cursor.close();
-            totalSong.setText(audioFiles.size()-1 +" Songs");
+            totalSong.setText(audioFiles.size() +" Songs");
             sortMusic(sortPos);
-            dialog.hide();
-//            audioAdapter.notifyDataSetChanged();
+         //   dialog.hide();
+            //audioAdapter.notifyDataSetChanged();
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_DELETE_PERMISSION) {
+            if (resultCode == RESULT_OK) {
+                // Người dùng đã cấp quyền, thử xóa lại tệp
+                deleteAudioFile(audioDelete);
+            } else {
+                // Người dùng từ chối cấp quyền, xử lý theo cách khác
+                Toast.makeText(this, "Permission denied to delete file", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private void deleteAudioFile(AudioFile audioFile) {
+        ContentResolver contentResolver = getContentResolver();
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        long audioId = getAudioIdFromFilePath(audioFile.getFilePath());
+
+        if (audioId != -1) {
+            Uri deleteUri = ContentUris.withAppendedId(uri, audioId);
+
+            try {
+                int rowsDeleted = contentResolver.delete(deleteUri, null, null);
+
+                if (rowsDeleted > 0) {
+                    // Xóa tệp khỏi danh sách audioFiles
+                    audioFiles.remove(audioFile);
+
+                    // Thông báo cho adapter về thay đổi
+                    audioAdapter.notifyDataSetChanged();
+
+                    // Cập nhật số lượng bài hát hiển thị
+                    totalSong.setText(audioFiles.size() + " Songs");
+
+                    // Hiển thị thông báo thành công cho người dùng
+                    Toast.makeText(this, "File deleted successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Hiển thị thông báo lỗi nếu không xóa được tệp
+                    Toast.makeText(this, "Failed to delete file", Toast.LENGTH_SHORT).show();
+                }
+            } catch (RecoverableSecurityException ex) {
+                // Yêu cầu người dùng cấp quyền xóa tệp
+                IntentSender intentSender = ex.getUserAction().getActionIntent().getIntentSender();
+                try {
+                    startIntentSenderForResult(intentSender, REQUEST_DELETE_PERMISSION, null, 0, 0, 0, null);
+                } catch (IntentSender.SendIntentException sendIntentException) {
+                    sendIntentException.printStackTrace();
+                    Toast.makeText(this, "Failed to initiate delete request", Toast.LENGTH_SHORT).show();
+                }
+            }
+        } else {
+            // Hiển thị thông báo nếu tệp không tồn tại
+            Toast.makeText(this, "File not found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Phương thức trợ giúp để lấy ID tệp âm thanh từ đường dẫn tệp
+    private long getAudioIdFromFilePath(String filePath) {
+        ContentResolver contentResolver = getContentResolver();
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String[] projection = {MediaStore.Audio.Media._ID};
+        String selection = MediaStore.Audio.Media.DATA + "=?";
+        String[] selectionArgs = {filePath};
+        Cursor cursor = contentResolver.query(uri, projection, selection, selectionArgs, null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                long id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+                cursor.close();
+                return id;
+            }
+            cursor.close();
+        }
+        return -1;
+    }
+
+
+
     public void sortMusic(int pos)
     {
         sortPos=pos;
@@ -783,8 +849,28 @@ public void getAudioFocus()
         }
 
     }
+    public void checkPermission()
+    {
+        String[] permissions = {
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.READ_MEDIA_AUDIO,
+                Manifest.permission.POST_NOTIFICATIONS,
+        };
+
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE);
+        // Load audio files if all permissions are granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED ) {
+            permissionAllowed=1;
+        }
+        else if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )
+        {
+            permissionAllowed=1;
+        }
+    }
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE) {
             if(Build.VERSION.SDK_INT>Build.VERSION_CODES.S) {
@@ -817,14 +903,17 @@ public void getAudioFocus()
             }
             if(permissionAllowed ==1) {
                 if (!isLoaded) {
-                    loadAudioFiles();
+
+                   loadAudioFiles();
                     isLoaded = true;
+                    dialog.dismiss();
                 }
                 NowPlayingList.addAll(audioFiles);
                 filteredAudioFiles = new ArrayList<>(audioFiles);
             }
         }
     }
+
 
     @Override
     protected void onResume() {

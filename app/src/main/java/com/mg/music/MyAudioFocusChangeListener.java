@@ -65,7 +65,7 @@ public class MyAudioFocusChangeListener implements AudioManager.OnAudioFocusChan
                     MusicList.isFocused=0;
                     MusicList.playPauseButton.setBackgroundResource(R.drawable.playbutton);
                     if(MusicList.isMediaActive==1)
-                    Player.pauseButton.setBackgroundResource(R.drawable.playbutton);
+                        Player.pauseButton.setBackgroundResource(R.drawable.playbutton);
                     showNotification(R.drawable.playbutton);
                 }
 
