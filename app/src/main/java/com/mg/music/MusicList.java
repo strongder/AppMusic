@@ -124,7 +124,6 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
         dialog.setCancelable(false);
         dialog.setInverseBackgroundForced(false);
         dialog.show();
-        Toast.makeText(this, "oncreat", Toast.LENGTH_LONG).show();
         audioFiles.clear();
         MyApplication myapp = (MyApplication) getApplication();
         mediaPlayer = myapp.getMediaPlayer();

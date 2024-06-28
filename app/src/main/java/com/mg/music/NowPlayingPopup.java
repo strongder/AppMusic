@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,6 +54,8 @@ public class NowPlayingPopup extends BottomSheetDialogFragment {
     {
         this.context=context;
     }
+
+
 
     @Override
     public void onStart() {
@@ -83,10 +86,15 @@ public class NowPlayingPopup extends BottomSheetDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
          view = inflater.inflate(R.layout.now_playing_popup, container, false);
 
+
+
+
         recyclerView=view.findViewById(R.id.nowPlayingRecycler);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
         audioAdapter=new AudioAdapter(NowPlayingList);
+
+
         recyclerView.setAdapter(audioAdapter);
         if (layoutManager != null) {
             layoutManager.scrollToPosition(pos);
