@@ -82,7 +82,6 @@ public class Player extends BottomSheetDialogFragment {
         MusicList.isMediaActive=1;
         AudioFile clickedAudio = MusicList.NowPlayingList.get(MusicList.pos);
         path = clickedAudio.getFilePath();
-
         itiming = view.findViewById(R.id.itiming);
         ftiming = view.findViewById(R.id.ftiming);
 
@@ -241,19 +240,6 @@ public class Player extends BottomSheetDialogFragment {
             }
         });
 
-//        stopButton=view.findViewById(R.id.stopButton);
-//        stopButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(mediaPlayer!=null)
-//                {
-//                    mediaPlayer.stop();
-//                    mediaPlayer.release();
-//                    seekbar.setVisibility(View.INVISIBLE);
-//                    mediaPlayer=null;
-//                }
-//            }
-//        });
 
         seekbar = view.findViewById(R.id.seek);
         seekbar.setProgressTintList(ColorStateList.valueOf(Color.parseColor("#FFFFFF")));

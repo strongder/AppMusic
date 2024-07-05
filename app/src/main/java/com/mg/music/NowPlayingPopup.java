@@ -49,7 +49,7 @@ public class NowPlayingPopup extends BottomSheetDialogFragment {
  public AudioAdapter audioAdapter;
     public View view;
 
- Context context;
+    Context context;
     NowPlayingPopup(Context context)
     {
         this.context=context;
@@ -85,9 +85,6 @@ public class NowPlayingPopup extends BottomSheetDialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
          view = inflater.inflate(R.layout.now_playing_popup, container, false);
-
-
-
 
         recyclerView=view.findViewById(R.id.nowPlayingRecycler);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);

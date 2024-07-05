@@ -91,7 +91,7 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
     public ImageButton sortArrow,reload;
     public int orderSort=0;
     public int sortPos=1;
-    public static final String[] paths = {"Date Added","Name", "Artist Name","Album Name", "Modified Date","Duration"};
+    public static final String[] paths = {"Date Added","Name", "Artist Name","Duration"};
     public static ShapeableImageView thumb;
     public static TextView songName;
     public static ImageButton playPauseButton;
@@ -117,7 +117,11 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkPermission();
+
+
         overridePendingTransition(R.anim.slide_down, R.anim.slide_up);
+
+
         setContentView(R.layout.activity_music_list);
         dialog=new ProgressDialog(this);
         dialog.setMessage("Loading Music Files");
@@ -133,6 +137,8 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
 
         miniPlayer=findViewById(R.id.miniPlayer);
         seekList=findViewById(R.id.seekList);
+        miniPlayer.setVisibility(View.GONE);
+        seekList.setVisibility(View.GONE);
 
         // Check if the permission is granted
         thumb=findViewById(R.id.thumb);
@@ -166,7 +172,6 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
             @Override
             public void onSwipeUp() {
                 NowPlay();
-
             }
 
             public void onSingleTap() {
@@ -275,8 +280,6 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
             }
         });
 
-        //loadAudioFiles();
-        //now audio files are loaded from the onRequestPermission method using loadAudioFiles() method
 
         searchSong=findViewById(R.id.searchsong);
         searchSong.setOnClickListener(new View.OnClickListener() {
@@ -327,9 +330,10 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
             public void onItemClick(View view, int position) {
                 pos = position;   //sending position to static variable to use in mainActivity
                 NowPlayingList.clear();
-                ;
                 NowPlayingList.addAll(audioFiles);
                 AudioFile clickedAudio = NowPlayingList.get(position);
+                miniPlayer.setVisibility(View.VISIBLE);
+                seekList.setVisibility(View.VISIBLE);
                 try {
                     showNotification(R.drawable.pausebutton);
                 } catch (Exception ae) {
@@ -340,7 +344,6 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
                 playPauseButton.setBackgroundResource(R.drawable.pausebutton);
 
                 hasPlayed = true;
-
                 playAudio(clickedAudio.getFilePath());
 
             }
@@ -370,12 +373,7 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
         }
     }
     }
-//    @Override
-//    protected void onPause() {
-//
-//        super.onPause();
-//        unbindService(this);
-//    }
+
 
     private void prevSong() {
         if (hasPlayed) {
@@ -431,8 +429,6 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
             Toast.makeText(this, "Nothing to Play", Toast.LENGTH_SHORT).show();
             return;
         }
-//        intent=new Intent(MusicList.this,MainActivity.class);
-//        startActivity(intent);
         p1=new Player(this);
         p1.show(getSupportFragmentManager(), "Player");
 
@@ -628,8 +624,6 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
             cursor.close();
             totalSong.setText(audioFiles.size() +" Songs");
             sortMusic(sortPos);
-         //   dialog.hide();
-            //audioAdapter.notifyDataSetChanged();
         }
     }
 
@@ -751,25 +745,6 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
                     Collections.sort(audioFiles, new Comparator<AudioFile>() {
                         @Override
                         public int compare(AudioFile audioFile1, AudioFile audioFile2) {
-                            return audioFile1.getAlbum().compareTo(audioFile2.getAlbum());
-                        }
-                    });
-                    audioAdapter.notifyDataSetChanged();
-                    break;
-                case 5:
-                    Collections.sort(audioFiles, new Comparator<AudioFile>() {
-                        @Override
-                        public int compare(AudioFile audioFile1, AudioFile audioFile2) {
-                            return audioFile1.getModifiedDate().compareTo(audioFile2.getModifiedDate());
-                        }
-                    });
-
-                    audioAdapter.notifyDataSetChanged();
-                    break;
-                case 6:
-                    Collections.sort(audioFiles, new Comparator<AudioFile>() {
-                        @Override
-                        public int compare(AudioFile audioFile1, AudioFile audioFile2) {
                             return Long.compare(audioFile1.getDuration(), audioFile2.getDuration());
                         }
                     });
@@ -812,25 +787,6 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
                     audioAdapter.notifyDataSetChanged();
                     break;
                 case 4:
-                    Collections.sort(audioFiles, new Comparator<AudioFile>() {
-                        @Override
-                        public int compare(AudioFile audioFile1, AudioFile audioFile2) {
-                            return audioFile2.getAlbum().compareTo(audioFile1.getAlbum());
-                        }
-                    });
-                    audioAdapter.notifyDataSetChanged();
-                    break;
-                case 5:
-                    Collections.sort(audioFiles, new Comparator<AudioFile>() {
-                        @Override
-                        public int compare(AudioFile audioFile1, AudioFile audioFile2) {
-                            return audioFile2.getModifiedDate().compareTo(audioFile1.getModifiedDate());
-                        }
-                    });
-
-                    audioAdapter.notifyDataSetChanged();
-                    break;
-                case 6:
                     Collections.sort(audioFiles, new Comparator<AudioFile>() {
                         @Override
                         public int compare(AudioFile audioFile1, AudioFile audioFile2) {
@@ -943,7 +899,6 @@ public class MusicList extends AppCompatActivity implements ActionPlaying, Servi
                 } else {
                     MusicList.thumb.setImageResource(R.drawable.musicbutton);
                     seekList.setBackgroundColor(parseColor("#1E1B1B"));
-
                     miniPlayer.setBackgroundColor(parseColor("#1E1B1B"));
 
                 }

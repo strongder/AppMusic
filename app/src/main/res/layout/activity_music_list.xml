@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MusicList"
-    android:background="#000000">
+    android:background="@drawable/background">
 
 
     <androidx.appcompat.widget.SearchView
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/searchsong"
         android:layout_marginStart="7dp"
-        android:layout_marginTop="26dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="7dp"
         android:gravity="center"
         android:orientation="horizontal"
@@ -44,8 +44,8 @@
             android:layout_gravity="center"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="8dp"
-            android:dropDownWidth="123dp"
             android:background="@drawable/spinner_border"
+            android:dropDownWidth="123dp"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:spinnerMode="dropdown" />
 
@@ -83,7 +83,7 @@
         android:layout_height="671dp"
         android:layout_below="@+id/linearLayout"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="43dp"
+        android:layout_marginTop="23dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="70dp"
         android:scrollbars="vertical"
@@ -99,7 +99,7 @@
 
 
         >
-<SeekBar
+     <SeekBar
     android:id="@+id/seekBar"
     android:layout_width="match_parent"
     android:layout_height="5dp"
